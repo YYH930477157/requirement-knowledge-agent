@@ -17,6 +17,18 @@ def test_read_json_array(tmp_path):
     assert read_json(path) == [{"id": "a"}]
 
 
+def test_read_json_accepts_utf8_bom(tmp_path):
+    path = tmp_path / "items.json"
+    path.write_text('\ufeff[{"id": "a"}]', encoding="utf-8")
+    assert read_json(path) == [{"id": "a"}]
+
+
+def test_read_jsonl_accepts_utf8_bom(tmp_path):
+    path = tmp_path / "items.jsonl"
+    path.write_text('\ufeff{"id": "a"}\n', encoding="utf-8")
+    assert read_jsonl(path) == [{"id": "a"}]
+
+
 def test_load_requirements_accepts_items_object(tmp_path):
     path = tmp_path / "requirements.json"
     write_json(path, {"items": [{"requirement_id": "REQ-1", "source_text": "显示轮显"}]})

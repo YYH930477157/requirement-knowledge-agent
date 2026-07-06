@@ -9,7 +9,7 @@ from .validation import load_default_solution, load_standard_clause
 
 
 def read_json(path: Path) -> Any:
-    return json.loads(path.read_text(encoding="utf-8"))
+    return json.loads(path.read_text(encoding="utf-8-sig"))
 
 
 def write_json(path: Path, payload: Any) -> None:
@@ -19,7 +19,7 @@ def write_json(path: Path, payload: Any) -> None:
 
 def read_jsonl(path: Path) -> list[dict[str, Any]]:
     rows = []
-    for line in path.read_text(encoding="utf-8").splitlines():
+    for line in path.read_text(encoding="utf-8-sig").splitlines():
         if line.strip():
             rows.append(json.loads(line))
     return rows
