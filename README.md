@@ -16,3 +16,36 @@
 - 默认方案层：可复用方案、默认行为、配置项、边界条件、验收标准。
 
 目标输出是“评审辅助包”，包含落地需求、引用依据、套用或建议的默认方案、裁决状态、置信度和待确认问题。
+
+## 快速开始
+
+安装依赖并运行测试：
+
+```powershell
+python -m pip install -e .
+python -m pytest -q
+```
+
+初始化空知识库：
+
+```powershell
+rka init-kb --out .\kb
+```
+
+准备需求 JSONL：
+
+```jsonl
+{"requirement_id":"REQ-1","source_text":"电表需要支持显示轮显"}
+```
+
+运行分析：
+
+```powershell
+rka analyze --requirements .\requirements.jsonl --kb .\kb --out .\out\review
+```
+
+输出文件：
+
+- `review_package.json`：完整机器可读结果。
+- `review_package.md`：按裁决状态分组的评审报告。
+- `software_requirements.xlsx`：软件侧需求工作簿。
