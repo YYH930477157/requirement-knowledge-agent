@@ -1,18 +1,18 @@
 # Requirement Knowledge Agent
 
-Independent knowledge agent for requirement analysis.
+面向需求分析的独立知识库 Agent。
 
-This repository is intended to turn standards and internal default solution patterns into a traceable, semi-constrained knowledge layer for landing software requirements.
+本仓库用于把“标准文件”和“内部默认方案”整理成可追溯、可约束、可评审的知识层，辅助生成可落地的软件需求。
 
-Current status: design stage.
+当前状态：设计阶段。
 
-Primary design document:
+主要设计文档：
 
 - `docs/superpowers/specs/2026-07-06-requirement-knowledge-agent-design.md`
 
-The first planned architecture is a two-layer knowledge base:
+第一版规划采用双层知识库：
 
-- standard evidence layer: clauses, constraints, definitions, citations.
-- default solution layer: reusable solution patterns, default behaviors, config items, boundary conditions, and acceptance criteria.
+- 标准依据层：条款、约束、定义、引用来源。
+- 默认方案层：可复用方案、默认行为、配置项、边界条件、验收标准。
 
-The output target is a review assistance package containing generated landing requirements, cited evidence, applied or suggested default solutions, decision status, confidence, and open questions.
+目标输出是“评审辅助包”，包含落地需求、引用依据、套用或建议的默认方案、裁决状态、置信度和待确认问题。

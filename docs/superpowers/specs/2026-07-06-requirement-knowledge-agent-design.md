@@ -1,112 +1,112 @@
-# Requirement Knowledge Agent Design
+# 需求知识库 Agent 设计
 
-Date: 2026-07-06
-Status: Pending user review
+日期：2026-07-06
+状态：待用户评审
 
-## Background
+## 背景
 
-The existing `requirement-atomizer-vue3` project already extracts atomic requirements from technical documents and produces software-oriented analysis. The next step is to create an independent repository that turns internal standards and default solution patterns into a reusable knowledge system for requirement analysis.
+现有 `requirement-atomizer-vue3` 项目已经可以从技术文档中抽取原子需求，并输出面向软件侧的需求分析结果。下一步需要把“标准文件”和“内部默认方案”组织成一个独立知识系统，让需求分析不只是依赖模型生成，而是能够结合标准依据、默认做法和评审规则，生成可落地、可追溯、可复核的软件需求。
 
-This project is not a general chat RAG system. It is a requirement-analysis support system where knowledge must be traceable, default solutions must not be silently over-applied, and generated implementation requirements must be reviewable.
+本项目不是普通聊天式 RAG。它的核心目标是：在需求分析过程中让知识库参与约束、裁决和生成，避免模型把默认方案、标准条款、数值、编号或引用来源自由发挥成“看起来合理但无法追溯”的内容。
 
-## Goals
+## 目标
 
-- Create an independent repository named `requirement-knowledge-agent`.
-- Maintain a two-layer knowledge base:
-  - standard evidence layer for standards, clauses, definitions, constraints, and citations.
-  - default solution layer for internal solution patterns, default behaviors, configuration items, boundary conditions, and acceptance criteria.
-- Analyze incoming requirements against both layers.
-- Apply a semi-constrained decision model:
-  - matched standards and matched default solutions constrain output.
-  - unmatched cases may receive LLM suggestions, but must be marked as suggestions or review items.
-- Generate a review assistance package that includes landing requirements, citations, applied/default solution records, confidence, and open questions.
-- Keep the project independently usable through CLI and file-based input/output first.
-- Leave room for later integration with `requirement-atomizer-vue3`.
+- 新建独立仓库 `requirement-knowledge-agent`。
+- 建立双层知识库：
+  - 标准依据层：管理标准条款、定义、约束等级、适用范围和来源引用。
+  - 默认方案层：管理内部默认方案、默认行为、配置项、边界条件、验收标准和适配建议。
+- 对输入需求同时匹配标准依据和默认方案。
+- 建立半约束裁决机制：
+  - 命中标准和默认方案时，输出必须受知识库约束。
+  - 未充分命中时，允许模型给建议，但必须标记为建议或待确认，不能伪装成已确定方案。
+- 生成评审辅助包，包含落地需求、标准引用、默认方案套用记录、裁决状态、置信度和待确认问题。
+- 第一版优先支持 CLI 和文件式输入输出，便于独立验证。
+- 后续可再接入 `requirement-atomizer-vue3` 的分析流程或桌面端。
 
-## Non-Goals
+## 非目标
 
-- Do not replace `requirement-atomizer-vue3`.
-- Do not build a full Agentic RAG planner in the first version.
-- Do not require a vector database in the first version.
-- Do not let the LLM invent standard references, default values, numbers, protocol codes, or source citations.
-- Do not treat all knowledge as free-form text. Structured standards and default solutions must remain first-class data.
+- 不替换 `requirement-atomizer-vue3`。
+- 第一版不做完整 Agentic RAG 多轮规划器。
+- 第一版不强依赖向量数据库。
+- 不允许 LLM 编造标准引用、默认值、数字、协议编号、OBIS、来源章节或其他结构化事实。
+- 不把所有知识都当作自由文本处理。标准依据和默认方案必须是结构化的一等数据。
 
-## Repository Boundary
+## 仓库边界
 
-`requirement-atomizer-vue3` remains responsible for:
+`requirement-atomizer-vue3` 继续负责：
 
-- document parsing.
-- atomic requirement extraction.
-- existing deterministic and LLM-assisted analysis flows.
-- desktop UI and current review workflows.
+- 文档解析。
+- 原子需求抽取。
+- 现有确定性和 LLM 辅助分析流程。
+- 桌面端 UI 和当前评审流程。
 
-`requirement-knowledge-agent` is responsible for:
+`requirement-knowledge-agent` 负责：
 
-- ingesting standards and default solution files.
-- compiling knowledge into validated runtime artifacts.
-- matching requirements against standards and default solutions.
-- deciding whether a default solution can be applied, suggested, reviewed, or blocked.
-- generating review assistance outputs.
+- 摄入标准文件和默认方案文件。
+- 编译并校验运行时知识库。
+- 将需求匹配到标准依据和默认方案。
+- 判断默认方案是否可以套用、仅建议、需要评审或被标准阻断。
+- 生成评审辅助输出。
 
-The first integration contract is file-based:
+第一阶段采用文件式集成：
 
 ```text
-Input:
-- raw requirement text
-- atomic requirement JSON or JSONL
-- standard source files
-- default solution tables
+输入：
+- 原始需求文本
+- 原子需求 JSON 或 JSONL
+- 标准文件
+- 默认方案表格
 
-Output:
+输出：
 - review_package.json
 - review_package.md
 - software_requirements.xlsx
 ```
 
-An HTTP API can be added later without changing the core decision model.
+后续可以在不改变核心裁决模型的前提下增加本地 HTTP API。
 
-## Knowledge Model
+## 知识模型
 
-### Standard Evidence Layer
+### 标准依据层
 
-The standard layer stores authoritative or semi-authoritative requirements from standards and internal documents.
+标准依据层保存来自标准文件或内部规范的权威/半权威约束。
 
-Required fields:
+建议字段：
 
 ```json
 {
   "clause_id": "STD-CLAUSE-0001",
   "source_file": "standard.docx",
   "source_section": "4.2.1",
-  "title": "Display behavior",
-  "text": "The device shall ...",
-  "keywords": ["display", "scroll", "obis"],
+  "title": "显示行为",
+  "text": "设备应当...",
+  "keywords": ["显示", "轮显", "OBIS"],
   "applies_to": ["display", "metering"],
   "constraint_level": "must",
   "citation": "standard.docx section 4.2.1"
 }
 ```
 
-`constraint_level` values:
+`constraint_level` 取值：
 
-- `must`: binding requirement. Conflicts block direct generation.
-- `should`: preferred requirement. Conflicts require review.
-- `reference`: contextual evidence. It can guide output but cannot force a decision by itself.
+- `must`：强制约束。若需求或默认方案与其冲突，应阻断直接生成。
+- `should`：推荐约束。若存在冲突，应进入评审确认。
+- `reference`：参考依据。可用于补充上下文，但不能单独决定方案。
 
-### Default Solution Layer
+### 默认方案层
 
-The default solution layer stores internal implementation patterns and reusable requirement templates.
+默认方案层保存公司内部可复用的实现模式和需求模板。
 
-Required fields:
+建议字段：
 
 ```json
 {
   "solution_id": "SOL-DISPLAY-0001",
-  "module": "Display",
-  "submodule": "Auto scroll",
-  "scenario": "Display cyclic measurement values",
-  "trigger_terms": ["display cycle", "auto scroll", "LCD"],
-  "default_behavior": "The software cycles configured display items in order.",
+  "module": "显示",
+  "submodule": "自动轮显",
+  "scenario": "显示测量值循环展示",
+  "trigger_terms": ["轮显", "自动显示", "LCD"],
+  "default_behavior": "软件按配置顺序循环显示条目。",
   "config_items": [
     {
       "name": "cycle_interval_seconds",
@@ -115,86 +115,86 @@ Required fields:
     }
   ],
   "boundary_conditions": [
-    "Empty display list shall not start cyclic display."
+    "显示列表为空时不应启动轮显。"
   ],
   "acceptance_criteria": [
-    "Given a configured display list, the UI cycles through entries in order."
+    "给定已配置的显示列表时，界面按顺序循环展示各条目。"
   ],
   "related_standard_clause_ids": ["STD-CLAUSE-0001"],
   "requires_confirmation": true
 }
 ```
 
-Default solutions can be used directly only when the requirement evidence is strong enough and no binding standard conflicts exist.
+默认方案只有在需求证据足够强、且不违反强制标准条款时，才能作为确定方案套用。
 
-## Semi-Constrained Decision Model
+## 半约束裁决模型
 
-Each requirement receives one decision status:
+每条需求最终得到一个裁决状态：
 
-- `applied`: a default solution is strongly matched and compatible with matched `must` clauses.
-- `suggested`: evidence is plausible, but the solution is not strong enough for automatic application.
-- `needs_review`: required evidence is missing, conflicting, or incomplete.
-- `blocked`: the requirement or selected solution conflicts with a `must` standard clause.
+- `applied`：默认方案强命中，且与命中的 `must` 标准兼容，可以套用。
+- `suggested`：证据合理，但不足以自动套用，只能作为建议。
+- `needs_review`：缺少必要依据、匹配不完整、模块不明确或存在歧义，需要人工确认。
+- `blocked`：需求或默认方案与 `must` 标准冲突，不能直接生成落地方案。
 
-Decision rules for the first version:
+第一版裁决规则：
 
 ```text
-Strong standard match + strong default solution match + no must conflict
+强标准命中 + 强默认方案命中 + 无 must 冲突
 -> applied
 
-Reference/should standard match + weak default solution match
+should/reference 标准命中 + 弱默认方案命中
 -> suggested
 
-No standard evidence, missing default fields, or ambiguous module match
+无标准依据、默认方案缺关键字段、模块匹配歧义
 -> needs_review
 
-Contradiction with matched must clause
+与 must 标准条款冲突
 -> blocked
 ```
 
-LLM generation must respect the decision:
+LLM 生成必须服从裁决状态：
 
-- `applied`: may generate landing requirement text using matched standards and default solution fields.
-- `suggested`: may generate a proposal, but the output must label it as a suggestion.
-- `needs_review`: may summarize gaps and propose questions, but must not present the solution as accepted.
-- `blocked`: must not generate a landing solution except to explain the conflict.
+- `applied`：可以基于命中的标准和默认方案生成落地需求。
+- `suggested`：可以生成建议方案，但输出必须明确标注为“建议”。
+- `needs_review`：可以总结缺口和提出澄清问题，但不能把方案写成已确定需求。
+- `blocked`：不能生成落地方案，只能解释冲突原因和引用依据。
 
-## Data Flow
+## 数据流
 
 ```text
-Source standards and default solution files
--> ingestion
--> validated knowledge artifacts
--> requirement input
--> standard matcher
--> default solution matcher
--> decision engine
--> constrained generator
--> review package exporter
+标准文件和默认方案文件
+-> 摄入
+-> 生成并校验知识库产物
+-> 输入需求
+-> 标准依据匹配
+-> 默认方案匹配
+-> 半约束裁决
+-> 受控生成
+-> 评审辅助包导出
 ```
 
-The first version uses deterministic structured matching before LLM generation:
+第一版优先使用确定性结构化匹配，再进入 LLM 生成：
 
-- exact IDs and source references.
-- normalized keyword matching.
-- module and submodule vocabulary matching.
-- relation checks between default solutions and standard clauses.
+- 精确 ID 和来源引用匹配。
+- 规范化关键词匹配。
+- 模块/子模块词表匹配。
+- 默认方案与标准条款关系校验。
 
-Vector search and reranking can be added later behind the matcher interface.
+向量检索、hybrid search 和 reranker 后续可以隐藏在 matcher 接口之后增加。
 
-## Review Package Output
+## 评审辅助包输出
 
-Each analyzed requirement produces:
+每条需求输出结构示例：
 
 ```json
 {
   "requirement_id": "REQ-0001",
-  "source_text": "Original requirement text",
-  "module": "Display",
-  "submodule": "Auto scroll",
+  "source_text": "原始需求文本",
+  "module": "显示",
+  "submodule": "自动轮显",
   "decision": "suggested",
   "confidence": 0.72,
-  "landing_requirement": "Software shall ...",
+  "landing_requirement": "软件应当...",
   "developer_guidance": ["..."],
   "acceptance_criteria": ["..."],
   "applied_solution_ids": ["SOL-DISPLAY-0001"],
@@ -206,21 +206,21 @@ Each analyzed requirement produces:
     }
   ],
   "open_questions": [
-    "Confirm the actual display cycle interval."
+    "请确认实际轮显周期。"
   ],
-  "reasoning_summary": "Matched display cycle terms and one related standard clause, but default interval requires confirmation."
+  "reasoning_summary": "命中了轮显相关关键词和一个标准条款，但默认周期仍需确认。"
 }
 ```
 
-The package-level outputs are:
+包级输出：
 
-- `review_package.json`: machine-readable full result.
-- `review_package.md`: human review report grouped by decision status.
-- `software_requirements.xlsx`: software-facing workbook for downstream review.
+- `review_package.json`：机器可读完整结果。
+- `review_package.md`：按裁决状态分组的人类评审报告。
+- `software_requirements.xlsx`：供软件侧继续评审和交付的需求工作簿。
 
-## Initial CLI Shape
+## 初始 CLI 形态
 
-The initial CLI should support:
+第一版 CLI 建议支持：
 
 ```powershell
 rka init-kb --out .\kb
@@ -229,53 +229,53 @@ rka ingest-solutions --input .\solutions.xlsx --out .\kb\default_solutions.json
 rka analyze --requirements .\requirements.jsonl --kb .\kb --out .\out\review
 ```
 
-`rka` is the tentative command name. It can be renamed before implementation if needed.
+`rka` 是暂定命令名，实施前可再改为 `req-kb` 或完整名称。
 
-## Error Handling
+## 错误处理
 
-- Invalid knowledge files fail validation with actionable field-level messages.
-- Missing standard citations prevent `applied` decisions when a solution declares related standards.
-- Malformed input requirements are skipped into an `input_errors` section instead of stopping the full run.
-- LLM failure degrades to deterministic output with empty generated narrative fields and an issue note.
-- Any generated value that cannot be traced to source requirement text, standard clauses, or default solution fields must be rejected or marked as suggestion-only.
+- 知识库文件字段非法时，输出可操作的字段级错误。
+- 默认方案声明关联标准但找不到标准条款时，不能进入 `applied`。
+- 输入需求格式错误时，写入 `input_errors`，不阻断整个批次。
+- LLM 调用失败时，降级为确定性输出，并记录问题说明。
+- 生成内容中的数值、编号、默认值或引用来源如果无法追溯到输入需求、标准条款或默认方案字段，必须拒绝或降级为建议。
 
-## Testing Strategy
+## 测试策略
 
-Use test fixtures that contain small artificial standards and default solutions. Do not rely on private real documents in tests.
+测试使用小型人工 fixture，不依赖真实私有标准文件。
 
-Required test areas:
+必须覆盖：
 
-- schema validation for standard clauses.
-- schema validation for default solutions.
-- standard matcher returns citations and constraint levels.
-- default solution matcher returns strong and weak matches.
-- decision engine maps evidence to `applied`, `suggested`, `needs_review`, and `blocked`.
-- generator guard rejects invented citations and ungrounded default values.
-- exporters write JSON, Markdown, and Excel with expected fields.
-- CLI commands return stable machine-readable envelopes.
+- 标准条款 schema 校验。
+- 默认方案 schema 校验。
+- 标准 matcher 能返回引用和约束等级。
+- 默认方案 matcher 能区分强命中和弱命中。
+- 裁决引擎能输出 `applied`、`suggested`、`needs_review`、`blocked`。
+- 生成护栏能拒绝编造引用和无依据默认值。
+- 导出器能写出 JSON、Markdown 和 Excel 的关键字段。
+- CLI 命令返回稳定的机器可读 envelope。
 
-## Integration Plan With Requirement Atomizer
+## 与 Requirement Atomizer 的集成计划
 
-The first integration should be file-based:
+第一阶段采用文件式集成：
 
 ```text
 requirement-atomizer-vue3
--> exports atomic requirements JSONL
+-> 导出原子需求 JSONL
 -> requirement-knowledge-agent analyze
--> outputs review package
--> requirement-atomizer-vue3 optionally imports selected outputs
+-> 生成评审辅助包
+-> requirement-atomizer-vue3 可选择导入评审结果
 ```
 
-Later integration can add:
+后续可扩展：
 
-- local HTTP service.
-- desktop UI callout.
-- shared review state.
-- direct use inside `ratomizer analyze`.
+- 本地 HTTP 服务。
+- 桌面端调用入口。
+- 共享评审状态。
+- 直接接入 `ratomizer analyze`。
 
-## Open Decisions
+## 待决策事项
 
-- Final CLI command name: `rka`, `req-kb`, or `requirement-knowledge-agent`.
-- Whether the first ingestion version should support `.docx` directly or require Markdown/JSON/Excel conversion first.
-- Whether `software_requirements.xlsx` should follow the current internal template exactly or use a neutral first-version workbook.
-- Whether default solutions should be edited as Excel first, Markdown first, or both.
+- 最终 CLI 命令名使用 `rka`、`req-kb` 还是 `requirement-knowledge-agent`。
+- 第一版标准摄入是否直接支持 `.docx`，还是先要求转换为 Markdown/JSON/Excel。
+- `software_requirements.xlsx` 是否严格沿用现有内部模板，还是先使用中立版工作簿。
+- 默认方案编辑源以 Excel 为主、Markdown 为主，还是两者都支持。
