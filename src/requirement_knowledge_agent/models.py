@@ -40,6 +40,7 @@ class DefaultSolution:
     config_items: tuple[ConfigItem, ...] = ()
     boundary_conditions: tuple[str, ...] = ()
     acceptance_criteria: tuple[str, ...] = ()
+    confirmation_questions: tuple[str, ...] = ()
     related_standard_clause_ids: tuple[str, ...] = ()
     requires_confirmation: bool = False
 
@@ -57,6 +58,7 @@ class StandardMatch:
     matched_terms: tuple[str, ...]
     score: int
     strength: MatchStrength
+    match_reasons: tuple[dict[str, object], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -65,6 +67,7 @@ class SolutionMatch:
     matched_terms: tuple[str, ...]
     score: int
     strength: MatchStrength
+    match_reasons: tuple[dict[str, object], ...] = ()
 
 
 @dataclass(frozen=True)

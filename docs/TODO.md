@@ -13,7 +13,7 @@ MVP 已完成并推送到 GitHub：
 - 半约束裁决：`applied`、`suggested`、`needs_review`、`blocked`。
 - 评审辅助包导出：JSON、Markdown、Excel。
 - CLI：`rka init-kb`、`rka validate`、`rka analyze`、`rka ingest-solutions`、`rka ingest-standards`、`rka evaluate`。
-- 测试基线：47 个测试通过。
+- 测试基线：53 个测试通过。
 
 下一阶段重点不是继续加复杂 Agent，而是让真实标准文件、默认方案和真实需求样本跑通闭环。
 
@@ -55,6 +55,7 @@ MVP 已完成并推送到 GitHub：
 | `config_items` | 配置项和默认值 |
 | `boundary_conditions` | 边界条件 |
 | `acceptance_criteria` | 验收标准 |
+| `confirmation_questions` | 人工确认问题 |
 | `related_standard_clause_ids` | 关联标准条款 |
 | `requires_confirmation` | 是否需要人工确认 |
 
@@ -172,18 +173,18 @@ samples/expected_decisions.json
 
 待办：
 
-- [ ] 为标准和默认方案匹配增加权重。
-- [ ] 区分标题命中、关键词命中、正文命中、模块命中。
-- [ ] 增加 `match_reason` 字段。
-- [ ] 增加冲突检测规则，例如禁止条件、排除场景、互斥方案。
-- [ ] 增加人工确认字段，例如 `confirmation_questions`。
-- [ ] 支持同一需求命中多个候选方案时输出排序和原因。
+- [x] 为标准和默认方案匹配增加权重。
+- [x] 区分标题命中、关键词命中、正文命中、模块命中。
+- [x] 增加 `match_reason` 字段。
+- [x] 增加冲突检测规则，例如禁止条件、排除场景、互斥方案。
+- [x] 增加人工确认字段，例如 `confirmation_questions`。
+- [x] 支持同一需求命中多个候选方案时输出排序和原因。
 
 验收标准：
 
-- [ ] 评审包能解释“为什么命中这个方案”。
-- [ ] 弱证据不会误判为 `applied`。
-- [ ] 冲突和歧义会进入 `needs_review` 或 `blocked`。
+- [x] 评审包能解释“为什么命中这个方案”。
+- [x] 弱证据不会误判为 `applied`。
+- [x] 冲突和歧义会进入 `needs_review` 或 `blocked`。
 
 ## M4：再考虑 RAG / Agentic 能力
 

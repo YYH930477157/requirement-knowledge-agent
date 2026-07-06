@@ -31,6 +31,7 @@ def test_ingest_solutions_excel_writes_runtime_json(tmp_path):
             "config_items",
             "boundary_conditions",
             "acceptance_criteria",
+            "confirmation_questions",
             "related_standard_clause_ids",
             "requires_confirmation",
         ],
@@ -45,6 +46,7 @@ def test_ingest_solutions_excel_writes_runtime_json(tmp_path):
                 '[{"name":"cycle_interval_seconds","default_value":"5","requires_confirmation":true}]',
                 "No entries means no cycle.\nManual override pauses cycling.",
                 "Entries are shown in order; Cycle interval can be configured.",
+                "Confirm display list source.\nConfirm cycle interval.",
                 "STD-DISPLAY-1; STD-DISPLAY-2",
                 "yes",
             ]
@@ -64,6 +66,10 @@ def test_ingest_solutions_excel_writes_runtime_json(tmp_path):
         "Cycle interval can be configured.",
     ]
     assert payload[0]["related_standard_clause_ids"] == ["STD-DISPLAY-1", "STD-DISPLAY-2"]
+    assert payload[0]["confirmation_questions"] == [
+        "Confirm display list source.",
+        "Confirm cycle interval.",
+    ]
     assert payload[0]["config_items"] == [
         {
             "name": "cycle_interval_seconds",

@@ -44,8 +44,9 @@ def analyze_requirements(
             "developer_guidance": _developer_guidance(best_solution),
             "acceptance_criteria": list(best_solution.acceptance_criteria) if best_solution else [],
             "applied_solution_ids": [best_solution.solution_id] if best_solution and decision.status in {"applied", "suggested"} else [],
+            "candidate_solution_ids": [match.solution.solution_id for match in solution_matches],
             "standard_citations": [_citation(match) for match in standard_matches],
-            "open_questions": list(decision.open_questions),
+            "open_questions": _open_questions(decision.open_questions, best_solution),
             "reasoning_summary": decision.reason,
             "matches": {
                 "standards": [_match_summary(match) for match in standard_matches],
@@ -90,6 +91,13 @@ def _developer_guidance(solution: DefaultSolution | None) -> list[str]:
     return guidance
 
 
+def _open_questions(decision_questions: tuple[str, ...], solution: DefaultSolution | None) -> list[str]:
+    questions = list(decision_questions)
+    if solution is not None:
+        questions.extend(question for question in solution.confirmation_questions if question not in questions)
+    return questions
+
+
 def _citation(match) -> dict[str, str]:
     return {
         "clause_id": match.clause.clause_id,
@@ -104,6 +112,8 @@ def _match_summary(match) -> dict[str, Any]:
         "matched_terms": list(match.matched_terms),
         "score": match.score,
         "strength": match.strength,
+        "match_reasons": list(match.match_reasons),
+        "match_reason": _format_match_reason(match.match_reasons),
     }
 
 
@@ -111,4 +121,12 @@ def _solution_match_summary(match) -> dict[str, Any]:
     payload = asdict(match)
     payload["solution"] = {"solution_id": match.solution.solution_id, "module": match.solution.module, "submodule": match.solution.submodule}
     payload["matched_terms"] = list(match.matched_terms)
+    payload["match_reasons"] = list(match.match_reasons)
+    payload["match_reason"] = _format_match_reason(match.match_reasons)
     return payload
+
+
+def _format_match_reason(reasons: tuple[dict[str, object], ...]) -> str:
+    if not reasons:
+        return ""
+    return "; ".join(f"{reason['source']} matched {reason['term']} (+{reason['weight']})" for reason in reasons)

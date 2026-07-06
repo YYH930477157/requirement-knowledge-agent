@@ -15,6 +15,7 @@
     ],
     "boundary_conditions": ["An empty display list disables cycling."],
     "acceptance_criteria": ["Configured entries are shown in order."],
+    "confirmation_questions": ["Confirm the display cycle interval."],
     "related_standard_clause_ids": ["STD-DISPLAY-CYCLE"],
     "requires_confirmation": false
   },
@@ -46,6 +47,7 @@
     ],
     "boundary_conditions": ["Retries stop after the configured maximum retry count."],
     "acceptance_criteria": ["A timeout triggers retry attempts before final failure."],
+    "confirmation_questions": ["Confirm the retry count and retry interval."],
     "related_standard_clause_ids": ["STD-COMM-RETRY"],
     "requires_confirmation": true
   },
@@ -58,6 +60,7 @@
     "default_behavior": "validates firmware package integrity before applying the update.",
     "boundary_conditions": ["Invalid packages are rejected before installation."],
     "acceptance_criteria": ["A valid package can be installed and an invalid package is rejected."],
+    "confirmation_questions": ["Confirm the accepted firmware package signature policy."],
     "related_standard_clause_ids": ["STD-FIRMWARE-UPDATE"],
     "requires_confirmation": true
   },

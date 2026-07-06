@@ -70,3 +70,30 @@ def test_explicit_conflict_with_must_clause_blocks():
 def test_missing_related_standard_prevents_applied():
     decision = decide_requirement(req(), [standard_match()], [solution_match(related=("STD-MISSING",))], {"STD-1"})
     assert decision.status == "needs_review"
+
+
+def test_weak_standard_evidence_prevents_applied_even_with_strong_solution():
+    weak_standard = StandardMatch(
+        clause=clause("should"),
+        matched_terms=("display",),
+        score=1,
+        strength="weak",
+        match_reasons=({"source": "applies_to", "term": "display", "weight": 1},),
+    )
+
+    decision = decide_requirement(req(), [weak_standard], [solution_match()], {"STD-1"})
+
+    assert decision.status == "suggested"
+    assert decision.open_questions
+
+
+def test_forbidden_language_with_must_standard_blocks():
+    decision = decide_requirement(
+        req("Display cycle must be disabled and not allowed for this product."),
+        [standard_match()],
+        [solution_match()],
+        {"STD-1"},
+    )
+
+    assert decision.status == "blocked"
+    assert "冲突" in decision.reason

@@ -25,13 +25,30 @@ def find_terms(text: str, terms: tuple[str, ...]) -> tuple[str, ...]:
 def match_standards(text: str, clauses: list[StandardClause], *, limit: int = 10) -> list[StandardMatch]:
     matches: list[StandardMatch] = []
     for clause in clauses:
-        terms = tuple(dict.fromkeys((*clause.keywords, clause.title, *clause.applies_to)))
-        matched_terms = find_terms(text, terms)
+        match_reasons = _weighted_reasons(
+            text,
+            (
+                ("title", (clause.title,), 5),
+                ("keyword", clause.keywords, 3),
+                ("applies_to", clause.applies_to, 1),
+                ("text", (clause.text,), 1),
+            ),
+        )
+        matched_terms = _terms_from_reasons(match_reasons)
         if not matched_terms:
             continue
-        score = sum(len(term) for term in matched_terms)
-        strength = "strong" if len(matched_terms) >= 2 or clause.constraint_level == "must" else "weak"
-        matches.append(StandardMatch(clause=clause, matched_terms=matched_terms, score=score, strength=strength))
+        score = sum(int(reason["weight"]) for reason in match_reasons)
+        has_substantive_match = any(reason["source"] in {"title", "keyword"} for reason in match_reasons)
+        strength = "strong" if len(matched_terms) >= 2 and has_substantive_match else "weak"
+        matches.append(
+            StandardMatch(
+                clause=clause,
+                matched_terms=matched_terms,
+                score=score,
+                strength=strength,
+                match_reasons=match_reasons,
+            )
+        )
     matches.sort(key=lambda item: (-item.score, item.clause.clause_id))
     return matches[:limit]
 
@@ -39,13 +56,55 @@ def match_standards(text: str, clauses: list[StandardClause], *, limit: int = 10
 def match_solutions(text: str, solutions: list[DefaultSolution], *, limit: int = 10) -> list[SolutionMatch]:
     matches: list[SolutionMatch] = []
     for solution in solutions:
-        terms = tuple(dict.fromkeys((*solution.trigger_terms, solution.module, solution.submodule, solution.scenario)))
-        matched_terms = find_terms(text, terms)
+        match_reasons = _weighted_reasons(
+            text,
+            (
+                ("trigger", solution.trigger_terms, 4),
+                ("module", (solution.module,), 2),
+                ("submodule", (solution.submodule,), 2),
+                ("scenario", (solution.scenario,), 1),
+                ("default_behavior", (solution.default_behavior,), 1),
+            ),
+        )
+        matched_terms = _terms_from_reasons(match_reasons)
         if not matched_terms:
             continue
-        score = sum(len(term) for term in matched_terms)
         trigger_matches = find_terms(text, solution.trigger_terms)
+        score = sum(int(reason["weight"]) for reason in match_reasons)
         strength = "strong" if len(trigger_matches) >= 2 else "weak"
-        matches.append(SolutionMatch(solution=solution, matched_terms=matched_terms, score=score, strength=strength))
+        matches.append(
+            SolutionMatch(
+                solution=solution,
+                matched_terms=matched_terms,
+                score=score,
+                strength=strength,
+                match_reasons=match_reasons,
+            )
+        )
     matches.sort(key=lambda item: (-item.score, item.solution.solution_id))
     return matches[:limit]
+
+
+def _weighted_reasons(
+    text: str,
+    groups: tuple[tuple[str, tuple[str, ...], int], ...],
+) -> tuple[dict[str, object], ...]:
+    reasons: list[dict[str, object]] = []
+    seen: set[tuple[str, str]] = set()
+    for source, terms, weight in groups:
+        for term in find_terms(text, terms):
+            key = (source, term)
+            if key in seen:
+                continue
+            seen.add(key)
+            reasons.append({"source": source, "term": term, "weight": weight})
+    return tuple(reasons)
+
+
+def _terms_from_reasons(reasons: tuple[dict[str, object], ...]) -> tuple[str, ...]:
+    terms = []
+    for reason in reasons:
+        term = str(reason["term"])
+        if term not in terms:
+            terms.append(term)
+    return tuple(terms)

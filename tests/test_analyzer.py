@@ -26,6 +26,7 @@ def solution(requires_confirmation=False):
         default_behavior="软件按配置顺序轮显条目。",
         boundary_conditions=("显示列表为空时不启动轮显。",),
         acceptance_criteria=("配置显示列表后，软件按顺序显示条目。",),
+        confirmation_questions=("请确认轮显周期。",),
         related_standard_clause_ids=("STD-1",),
         requires_confirmation=requires_confirmation,
     )
@@ -59,6 +60,36 @@ def test_suggested_item_includes_open_questions():
     package = analyze_requirements([RequirementInput("REQ-1", "设备需要 LCD")], [clause()], [weak_solution])
     assert package["items"][0]["decision"] in {"suggested", "needs_review"}
     assert package["items"][0]["open_questions"]
+
+
+def test_review_item_exposes_match_reasons_and_candidate_solution_ranking():
+    alternative = DefaultSolution(
+        solution_id="SOL-2",
+        module="显示",
+        submodule="LCD",
+        scenario="显示",
+        trigger_terms=("显示",),
+        default_behavior="显示信息。",
+    )
+
+    package = analyze_requirements(
+        [RequirementInput("REQ-1", "电表需要支持显示轮显")],
+        [clause()],
+        [alternative, solution()],
+    )
+    item = package["items"][0]
+
+    assert item["candidate_solution_ids"] == ["SOL-1", "SOL-2"]
+    assert item["matches"]["standards"][0]["match_reasons"]
+    assert item["matches"]["standards"][0]["match_reason"]
+    assert item["matches"]["solutions"][0]["match_reasons"]
+    assert item["matches"]["solutions"][0]["match_reason"]
+
+
+def test_review_item_includes_solution_confirmation_questions():
+    package = analyze_requirements([RequirementInput("REQ-1", "电表需要支持显示轮显")], [clause()], [solution()])
+
+    assert "请确认轮显周期。" in package["items"][0]["open_questions"]
 
 
 def test_malformed_requirement_is_reported_as_input_error():

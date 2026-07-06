@@ -17,6 +17,7 @@ LIST_FIELDS = {
     "trigger_terms",
     "boundary_conditions",
     "acceptance_criteria",
+    "confirmation_questions",
     "related_standard_clause_ids",
 }
 REQUIRED_SOLUTION_COLUMNS = (

@@ -35,6 +35,7 @@ def valid_solution():
         "config_items": [{"name": "interval", "default_value": "5", "requires_confirmation": True}],
         "boundary_conditions": ["No entries means no cycle."],
         "acceptance_criteria": ["Entries are shown in order."],
+        "confirmation_questions": ["Confirm cycle interval."],
         "related_standard_clause_ids": ["STD-1"],
         "requires_confirmation": True,
     }
@@ -67,6 +68,7 @@ def test_valid_default_solution_passes():
     solution = load_default_solution(valid_solution())
     assert isinstance(solution, DefaultSolution)
     assert solution.solution_id == "SOL-1"
+    assert solution.confirmation_questions == ("Confirm cycle interval.",)
 
 
 def test_default_solution_missing_id_fails():

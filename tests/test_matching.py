@@ -41,10 +41,52 @@ def test_match_standards_by_keyword():
     assert matches[0].strength == "strong"
 
 
+def test_standard_match_reports_weighted_reasons_by_source():
+    matches = match_standards("The Display cycle behavior applies to display screens", [clause()])
+
+    assert matches[0].score > 0
+    assert matches[0].match_reasons == (
+        {"source": "title", "term": "display cycle", "weight": 5},
+        {"source": "keyword", "term": "display", "weight": 3},
+        {"source": "keyword", "term": "cycle", "weight": 3},
+        {"source": "applies_to", "term": "display", "weight": 1},
+    )
+
+
 def test_match_solution_strong_when_two_trigger_terms_match():
     matches = match_solutions("LCD 需要支持轮显", [solution()])
     assert matches[0].solution.solution_id == "SOL-1"
     assert matches[0].strength == "strong"
+
+
+def test_solution_match_reports_weighted_reasons_and_ranks_candidates():
+    better = DefaultSolution(
+        solution_id="SOL-2",
+        module="Display",
+        submodule="Cycle",
+        scenario="Display cycle",
+        trigger_terms=("display", "cycle"),
+        default_behavior="Cycle display values.",
+    )
+    weaker = DefaultSolution(
+        solution_id="SOL-3",
+        module="Display",
+        submodule="Status",
+        scenario="Display status",
+        trigger_terms=("display",),
+        default_behavior="Show status.",
+    )
+
+    matches = match_solutions("Need display cycle support", [weaker, better])
+
+    assert [match.solution.solution_id for match in matches] == ["SOL-2", "SOL-3"]
+    assert matches[0].match_reasons == (
+        {"source": "trigger", "term": "display", "weight": 4},
+        {"source": "trigger", "term": "cycle", "weight": 4},
+        {"source": "module", "term": "display", "weight": 2},
+        {"source": "submodule", "term": "cycle", "weight": 2},
+        {"source": "scenario", "term": "display cycle", "weight": 1},
+    )
 
 
 def test_match_solution_weak_when_one_trigger_term_matches():

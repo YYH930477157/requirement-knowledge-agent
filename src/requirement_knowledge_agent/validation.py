@@ -77,7 +77,13 @@ def validate_default_solution(raw: dict[str, Any]) -> list[str]:
             issues.append(f"{field} is required")
     if not isinstance(raw.get("trigger_terms"), list) or not _string_tuple(raw.get("trigger_terms")):
         issues.append("trigger_terms must be a non-empty list")
-    for field in ("config_items", "boundary_conditions", "acceptance_criteria", "related_standard_clause_ids"):
+    for field in (
+        "config_items",
+        "boundary_conditions",
+        "acceptance_criteria",
+        "confirmation_questions",
+        "related_standard_clause_ids",
+    ):
         if field in raw and not isinstance(raw.get(field), list):
             issues.append(f"{field} must be a list")
     return issues
@@ -107,6 +113,7 @@ def load_default_solution(raw: dict[str, Any]) -> DefaultSolution:
         config_items=tuple(config_items),
         boundary_conditions=_string_tuple(raw.get("boundary_conditions", [])),
         acceptance_criteria=_string_tuple(raw.get("acceptance_criteria", [])),
+        confirmation_questions=_string_tuple(raw.get("confirmation_questions", [])),
         related_standard_clause_ids=_string_tuple(raw.get("related_standard_clause_ids", [])),
         requires_confirmation=bool(raw.get("requires_confirmation", False)),
     )

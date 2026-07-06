@@ -64,7 +64,10 @@ def decide_requirement(
 
 def _has_must_conflict(source_text: str, must_matches: list[StandardMatch]) -> bool:
     lowered = source_text.lower()
+    conflict_terms = ("not allowed", "shall not", "must not", "disabled", "disable", "forbidden", "prohibited")
     for match in must_matches:
         if f"conflict:{match.clause.clause_id.lower()}" in lowered:
+            return True
+        if any(term in lowered for term in conflict_terms) and any(term in lowered for term in match.matched_terms):
             return True
     return False
