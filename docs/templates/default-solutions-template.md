@@ -33,6 +33,24 @@ Use one worksheet. The first row must contain the field names below. Each follow
 rka ingest-solutions --input .\default_solutions.xlsx --out .\kb\default_solutions.json
 ```
 
+For the meter standardized requirement workbook, use the specialized importer:
+
+```powershell
+rka ingest-meter-template-solutions --input "C:\Users\YYHwudi\Desktop\Canna-29\电表软件标准化需求列表-V2.3.12 - 2026-4-14..xlsx" --out .\kb\default_solutions.json
+```
+
+The meter importer treats each supported requirement sheet row as one default solution:
+
+| Meter workbook column | Runtime field |
+| --- | --- |
+| Sheet name | `module` |
+| `子模块` | `submodule` |
+| `描述` | `scenario` |
+| `需求`, then `需求模版`, then `说明、示例、注意事项` | `default_behavior` |
+| Sheet name, sheet topic, `子模块`, cleaned `描述` | `trigger_terms` |
+| `说明、示例、注意事项` | `boundary_conditions` |
+| Confirmation-like notes such as `确认`, `需说明`, `如可配置`, `根据客户需求` | `confirmation_questions` and `requires_confirmation` |
+
 The generated JSON can be checked with:
 
 ```powershell

@@ -33,6 +33,15 @@ def write_solution_workbook(path):
     workbook.save(path)
 
 
+def write_meter_template_workbook(path):
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.title = "显示需求"
+    sheet.append(["关闭", "序号", "子模块", "描述", "需求模版", "需求", "说明、示例、注意事项"])
+    sheet.append(["", "1", "显示格式", "LCD背光：", "支持", "支持", "确认是否支持背光"])
+    workbook.save(path)
+
+
 def test_init_kb_creates_empty_files(tmp_path):
     out = tmp_path / "kb"
     assert main(["init-kb", "--out", str(out)]) == 0
@@ -102,6 +111,19 @@ def test_ingest_solutions_writes_default_solutions_json(tmp_path):
     payload = json.loads(out.read_text(encoding="utf-8"))
     assert payload[0]["solution_id"] == "SOL-1"
     assert payload[0]["trigger_terms"] == ["display", "cycle"]
+
+
+def test_ingest_meter_template_solutions_writes_default_solutions_json(tmp_path):
+    source = tmp_path / "meter_template.xlsx"
+    out = tmp_path / "kb" / "default_solutions.json"
+    write_meter_template_workbook(source)
+
+    assert main(["ingest-meter-template-solutions", "--input", str(source), "--out", str(out)]) == 0
+
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    assert payload[0]["solution_id"] == "SOL-METER-DISPLAY-0002"
+    assert payload[0]["default_behavior"] == "支持"
+    assert payload[0]["confirmation_questions"] == ["请确认显示格式/LCD背光：确认是否支持背光"]
 
 
 def test_ingest_standards_writes_standards_json(tmp_path):

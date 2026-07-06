@@ -8,7 +8,7 @@ from pathlib import Path
 from .analyzer import analyze_requirements
 from .evaluation import evaluate_package
 from .exporters import export_review_package
-from .ingestion import ingest_solutions_excel, ingest_standards
+from .ingestion import ingest_meter_template_solutions, ingest_solutions_excel, ingest_standards
 from .io import load_requirements, load_solutions, load_standards, read_json, write_json
 from .validation import KnowledgeValidationError
 
@@ -23,6 +23,8 @@ def main(argv: list[str] | None = None) -> int:
             return command_validate(args)
         if args.command == "ingest-solutions":
             return command_ingest_solutions(args)
+        if args.command == "ingest-meter-template-solutions":
+            return command_ingest_meter_template_solutions(args)
         if args.command == "ingest-standards":
             return command_ingest_standards(args)
         if args.command == "analyze":
@@ -52,6 +54,13 @@ def build_parser() -> argparse.ArgumentParser:
     )
     ingest_solutions.add_argument("--input", type=Path, required=True)
     ingest_solutions.add_argument("--out", type=Path, required=True)
+
+    ingest_meter_template = subparsers.add_parser(
+        "ingest-meter-template-solutions",
+        help="Convert a meter standardized requirement workbook to default solutions JSON.",
+    )
+    ingest_meter_template.add_argument("--input", type=Path, required=True)
+    ingest_meter_template.add_argument("--out", type=Path, required=True)
 
     ingest_standards_parser = subparsers.add_parser(
         "ingest-standards",
@@ -96,6 +105,12 @@ def command_validate(args: argparse.Namespace) -> int:
 
 def command_ingest_solutions(args: argparse.Namespace) -> int:
     payload = ingest_solutions_excel(args.input, args.out)
+    print(json.dumps({"ok": True, "out": str(args.out), "default_solutions": len(payload)}, ensure_ascii=False))
+    return 0
+
+
+def command_ingest_meter_template_solutions(args: argparse.Namespace) -> int:
+    payload = ingest_meter_template_solutions(args.input, args.out)
     print(json.dumps({"ok": True, "out": str(args.out), "default_solutions": len(payload)}, ensure_ascii=False))
     return 0
 
