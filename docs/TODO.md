@@ -12,8 +12,8 @@ MVP 已完成并推送到 GitHub：
 - 确定性 matcher。
 - 半约束裁决：`applied`、`suggested`、`needs_review`、`blocked`。
 - 评审辅助包导出：JSON、Markdown、Excel。
-- CLI：`rka init-kb`、`rka validate`、`rka analyze`。
-- 测试基线：35 个测试通过。
+- CLI：`rka init-kb`、`rka validate`、`rka analyze`、`rka ingest-solutions`、`rka ingest-standards`、`rka evaluate`。
+- 测试基线：47 个测试通过。
 
 下一阶段重点不是继续加复杂 Agent，而是让真实标准文件、默认方案和真实需求样本跑通闭环。
 
@@ -23,10 +23,10 @@ MVP 已完成并推送到 GitHub：
 
 ### M1.1 定义真实知识库模板
 
-- [ ] 设计 `standards.xlsx` 模板。
-- [ ] 设计 `default_solutions.xlsx` 模板。
-- [ ] 在 `docs/templates/` 下保存模板字段说明。
-- [ ] 给每个字段标注是否必填、是否参与匹配、是否进入生成输出。
+- [x] 设计标准依据层运行时字段模板。
+- [x] 设计 `default_solutions.xlsx` 模板。
+- [x] 在 `docs/templates/` 下保存模板字段说明。
+- [x] 给每个字段标注是否必填、是否参与匹配、是否进入生成输出。
 
 建议标准依据层字段：
 
@@ -60,9 +60,9 @@ MVP 已完成并推送到 GitHub：
 
 验收标准：
 
-- [ ] 模板字段能完整映射到当前 JSON schema。
-- [ ] 示例模板能被后续摄入命令转换为运行时 JSON。
-- [ ] 字段说明能让非开发人员维护知识库。
+- [x] 模板字段能完整映射到当前 JSON schema。
+- [x] 默认方案示例模板能被摄入命令转换为运行时 JSON。
+- [x] 字段说明能让非开发人员维护知识库。
 
 ### M1.2 实现默认方案 Excel 摄入
 
@@ -74,19 +74,19 @@ rka ingest-solutions --input .\default_solutions.xlsx --out .\kb\default_solutio
 
 待办：
 
-- [ ] 增加 Excel 读取依赖使用方式说明。
-- [ ] 实现 `ingest-solutions` CLI 子命令。
-- [ ] 支持单 sheet 默认方案表。
-- [ ] 支持用分号或换行解析 `trigger_terms`、`boundary_conditions`、`acceptance_criteria`。
-- [ ] 支持 `config_items` 的基础 JSON 字符串格式。
-- [ ] 对必填字段缺失输出字段级错误。
-- [ ] 增加测试 fixture，不使用真实私有文件。
+- [x] 增加 Excel 读取依赖使用方式说明。
+- [x] 实现 `ingest-solutions` CLI 子命令。
+- [x] 支持单 sheet 默认方案表。
+- [x] 支持用分号或换行解析 `trigger_terms`、`boundary_conditions`、`acceptance_criteria`。
+- [x] 支持 `config_items` 的基础 JSON 字符串格式。
+- [x] 对必填字段缺失输出字段级错误。
+- [x] 增加测试 fixture，不使用真实私有文件。
 
 验收标准：
 
-- [ ] 输入一个小型 Excel，可生成 `default_solutions.json`。
-- [ ] 生成的 JSON 可通过 `rka validate --kb .\kb`。
-- [ ] 摄入结果可被 `rka analyze` 使用。
+- [x] 输入一个小型 Excel，可生成 `default_solutions.json`。
+- [x] 生成的 JSON 可通过 `rka validate --kb .\kb`。
+- [x] 摄入结果可被 `rka analyze` 使用。
 
 ### M1.3 实现标准依据摄入
 
@@ -100,18 +100,18 @@ rka ingest-standards --input .\standards --out .\kb\standards.json
 
 待办：
 
-- [ ] 设计 Markdown frontmatter 或简化格式。
-- [ ] 支持从目录读取多个 `.md` 文件。
-- [ ] 每个条款保留 `source_file`、`source_section`、`citation`。
-- [ ] 支持 `constraint_level` 默认值和合法性校验。
-- [ ] 支持关键词字段解析。
-- [ ] 增加人工 fixture 测试。
+- [x] 设计 Markdown frontmatter 或简化格式。
+- [x] 支持从目录读取多个 `.md` 文件。
+- [x] 每个条款保留 `source_file`、`source_section`、`citation`。
+- [x] 支持 `constraint_level` 默认值和合法性校验。
+- [x] 支持关键词字段解析。
+- [x] 增加人工 fixture 测试。
 
 验收标准：
 
-- [ ] 输入一个标准目录，可生成 `standards.json`。
-- [ ] 每条标准依据都有可追溯引用。
-- [ ] 生成结果可参与 `rka analyze`。
+- [x] 输入一个标准目录，可生成 `standards.json`。
+- [x] 每条标准依据都有可追溯引用。
+- [x] 生成结果可参与 `rka analyze`。
 
 ### M1.4 建立真实需求样本集
 
@@ -137,16 +137,16 @@ samples/expected_decisions.json
 
 待办：
 
-- [ ] 准备 10 条真实需求样本。
-- [ ] 覆盖 `applied`、`suggested`、`needs_review`、`blocked`。
-- [ ] 增加评估命令或测试脚本。
-- [ ] 输出命中率、裁决准确率和失败案例。
+- [x] 准备 10 条人工需求样本。
+- [x] 覆盖 `applied`、`suggested`、`needs_review`、`blocked`。
+- [x] 增加评估命令或测试脚本。
+- [x] 输出命中率、裁决准确率和失败案例。
 
 验收标准：
 
-- [ ] 10 条样本可一键分析。
-- [ ] 每条样本都有期望结果。
-- [ ] 分析结果能定位误匹配和漏匹配。
+- [x] 10 条样本可一键分析。
+- [x] 每条样本都有期望结果。
+- [x] 分析结果能定位误匹配和漏匹配。
 
 ## M2：接入 requirement-atomizer-vue3
 
@@ -154,17 +154,17 @@ samples/expected_decisions.json
 
 待办：
 
-- [ ] 明确 `requirement-atomizer-vue3` 导出的 JSONL 字段。
-- [ ] 增加兼容输入适配器。
-- [ ] 在本项目中加入 `samples/from_atomizer.jsonl` 示例。
-- [ ] 编写文档说明如何从 atomizer 输出运行 `rka analyze`。
+- [x] 明确 `requirement-atomizer-vue3` 导出的 JSONL 字段。
+- [x] 增加兼容输入适配器。
+- [x] 在本项目中加入 `samples/from_atomizer.jsonl` 示例。
+- [x] 编写文档说明如何从 atomizer 输出运行 `rka analyze`。
 - [ ] 评估是否需要把结果导回 atomizer 的桌面端。
 
 验收标准：
 
-- [ ] atomizer 导出的原子需求 JSONL 可直接或轻量转换后分析。
-- [ ] 输出评审辅助包可被软件需求评审人员阅读。
-- [ ] 不破坏现有 atomizer 仓库。
+- [x] atomizer 导出的原子需求 JSONL 可直接或轻量转换后分析。
+- [x] 输出评审辅助包可被软件需求评审人员阅读。
+- [x] 不破坏现有 atomizer 仓库。
 
 ## M3：增强匹配质量和评审控制
 

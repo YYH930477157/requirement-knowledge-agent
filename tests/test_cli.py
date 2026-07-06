@@ -1,6 +1,36 @@
 import json
 
+from openpyxl import Workbook
+
 from requirement_knowledge_agent.cli import main
+
+
+def write_solution_workbook(path):
+    workbook = Workbook()
+    sheet = workbook.active
+    sheet.append(
+        [
+            "solution_id",
+            "module",
+            "submodule",
+            "scenario",
+            "trigger_terms",
+            "default_behavior",
+            "related_standard_clause_ids",
+        ]
+    )
+    sheet.append(
+        [
+            "SOL-1",
+            "Display",
+            "Cycle",
+            "Automatic display cycle",
+            "display; cycle",
+            "Cycle configured display entries.",
+            "STD-1",
+        ]
+    )
+    workbook.save(path)
 
 
 def test_init_kb_creates_empty_files(tmp_path):
@@ -60,3 +90,102 @@ def test_analyze_writes_review_outputs(tmp_path):
 
 def test_analyze_returns_non_zero_for_missing_files(tmp_path):
     assert main(["analyze", "--requirements", str(tmp_path / "missing.jsonl"), "--kb", str(tmp_path), "--out", str(tmp_path / "out")]) == 2
+
+
+def test_ingest_solutions_writes_default_solutions_json(tmp_path):
+    source = tmp_path / "default_solutions.xlsx"
+    out = tmp_path / "kb" / "default_solutions.json"
+    write_solution_workbook(source)
+
+    assert main(["ingest-solutions", "--input", str(source), "--out", str(out)]) == 0
+
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    assert payload[0]["solution_id"] == "SOL-1"
+    assert payload[0]["trigger_terms"] == ["display", "cycle"]
+
+
+def test_ingest_standards_writes_standards_json(tmp_path):
+    source = tmp_path / "standards"
+    source.mkdir()
+    (source / "display.md").write_text(
+        """---
+clause_id: STD-1
+source_section: 1
+title: Display
+keywords: display; cycle
+applies_to: display
+constraint_level: must
+---
+The display shall cycle.
+""",
+        encoding="utf-8",
+    )
+    out = tmp_path / "kb" / "standards.json"
+
+    assert main(["ingest-standards", "--input", str(source), "--out", str(out)]) == 0
+
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    assert payload[0]["clause_id"] == "STD-1"
+    assert payload[0]["keywords"] == ["display", "cycle"]
+
+
+def test_evaluate_writes_metrics_json(tmp_path):
+    kb = tmp_path / "kb"
+    main(["init-kb", "--out", str(kb)])
+    (kb / "standards.json").write_text(
+        json.dumps(
+            [
+                {
+                    "clause_id": "STD-1",
+                    "source_file": "s.md",
+                    "source_section": "1",
+                    "title": "Display",
+                    "text": "The display shall cycle.",
+                    "keywords": ["display", "cycle"],
+                    "applies_to": ["display"],
+                    "constraint_level": "must",
+                    "citation": "s.md 1",
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+    (kb / "default_solutions.json").write_text(
+        json.dumps(
+            [
+                {
+                    "solution_id": "SOL-1",
+                    "module": "Display",
+                    "submodule": "Cycle",
+                    "scenario": "Display cycle",
+                    "trigger_terms": ["display", "cycle"],
+                    "default_behavior": "Cycle configured display entries.",
+                    "related_standard_clause_ids": ["STD-1"],
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+    requirements = tmp_path / "requirements.jsonl"
+    requirements.write_text('{"requirement_id":"REQ-1","source_text":"Need display cycle support"}\n', encoding="utf-8")
+    expected = tmp_path / "expected_decisions.json"
+    expected.write_text(
+        json.dumps(
+            [
+                {
+                    "requirement_id": "REQ-1",
+                    "expected_standard_clause_ids": ["STD-1"],
+                    "expected_solution_ids": ["SOL-1"],
+                    "expected_decision": "applied",
+                }
+            ]
+        ),
+        encoding="utf-8",
+    )
+    out = tmp_path / "metrics.json"
+
+    assert main(["evaluate", "--requirements", str(requirements), "--kb", str(kb), "--expected", str(expected), "--out", str(out)]) == 0
+
+    payload = json.loads(out.read_text(encoding="utf-8"))
+    assert payload["summary"]["decision_accuracy"] == 1.0
+    assert payload["failures"] == []

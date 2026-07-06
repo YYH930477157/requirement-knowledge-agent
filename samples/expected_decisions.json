@@ -1,0 +1,72 @@
+[
+  {
+    "requirement_id": "REQ-DISPLAY-CYCLE",
+    "expected_standard_clause_ids": ["STD-DISPLAY-CYCLE"],
+    "expected_solution_ids": ["SOL-DISPLAY-CYCLE"],
+    "expected_decision": "applied",
+    "notes": "Strong must standard and strong default solution."
+  },
+  {
+    "requirement_id": "REQ-ALARM-EVENT",
+    "expected_standard_clause_ids": ["STD-ALARM-EVENT"],
+    "expected_solution_ids": ["SOL-ALARM-EVENT"],
+    "expected_decision": "applied",
+    "notes": "Strong must standard and strong alarm solution."
+  },
+  {
+    "requirement_id": "REQ-COMM-RETRY",
+    "expected_standard_clause_ids": ["STD-COMM-RETRY"],
+    "expected_solution_ids": ["SOL-COMM-RETRY"],
+    "expected_decision": "suggested",
+    "notes": "Solution requires confirmation, so analyzer downgrades applied to suggested."
+  },
+  {
+    "requirement_id": "REQ-FIRMWARE-UPDATE",
+    "expected_standard_clause_ids": ["STD-FIRMWARE-UPDATE"],
+    "expected_solution_ids": ["SOL-FIRMWARE-UPDATE"],
+    "expected_decision": "suggested",
+    "notes": "Firmware validation default requires human confirmation."
+  },
+  {
+    "requirement_id": "REQ-DISPLAY-CONFLICT",
+    "expected_standard_clause_ids": ["STD-DISPLAY-CYCLE"],
+    "expected_solution_ids": ["SOL-DISPLAY-CYCLE"],
+    "expected_decision": "blocked",
+    "notes": "Synthetic conflict marker exercises must-clause blocking."
+  },
+  {
+    "requirement_id": "REQ-UNKNOWN-THEME",
+    "expected_standard_clause_ids": [],
+    "expected_solution_ids": [],
+    "expected_decision": "needs_review",
+    "notes": "No matching sample standard or solution."
+  },
+  {
+    "requirement_id": "REQ-LOAD-PROFILE",
+    "expected_standard_clause_ids": ["STD-LOAD-PROFILE"],
+    "expected_solution_ids": [],
+    "expected_decision": "needs_review",
+    "notes": "Standard context exists, but no default solution is available."
+  },
+  {
+    "requirement_id": "REQ-REMOTE-DISCONNECT",
+    "expected_standard_clause_ids": ["STD-REMOTE-DISCONNECT"],
+    "expected_solution_ids": ["SOL-REMOTE-DISCONNECT"],
+    "expected_decision": "needs_review",
+    "notes": "Default solution references a missing related standard clause."
+  },
+  {
+    "requirement_id": "REQ-SEC-AUDIT",
+    "expected_standard_clause_ids": ["STD-SEC-AUDIT"],
+    "expected_solution_ids": ["SOL-SEC-AUDIT"],
+    "expected_decision": "applied",
+    "notes": "Strong should standard and strong default solution."
+  },
+  {
+    "requirement_id": "REQ-TARIFF-SCHEDULE",
+    "expected_standard_clause_ids": ["STD-TARIFF-SCHEDULE"],
+    "expected_solution_ids": ["SOL-TARIFF-SCHEDULE"],
+    "expected_decision": "suggested",
+    "notes": "Only reference-level standard support, so the solution remains suggested."
+  }
+]

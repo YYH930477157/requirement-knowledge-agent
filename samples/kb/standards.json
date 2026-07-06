@@ -1,0 +1,90 @@
+[
+  {
+    "clause_id": "STD-DISPLAY-CYCLE",
+    "source_file": "sample-display-standard.md",
+    "source_section": "4.2.1",
+    "title": "Display cycle behavior",
+    "text": "The device shall support configured display cycling.",
+    "keywords": ["display", "cycle", "lcd"],
+    "applies_to": ["display"],
+    "constraint_level": "must",
+    "citation": "sample-display-standard.md section 4.2.1"
+  },
+  {
+    "clause_id": "STD-ALARM-EVENT",
+    "source_file": "sample-alarm-standard.md",
+    "source_section": "5.1",
+    "title": "Alarm event logging",
+    "text": "The device shall record alarm events for review.",
+    "keywords": ["alarm", "event", "logging"],
+    "applies_to": ["alarm"],
+    "constraint_level": "must",
+    "citation": "sample-alarm-standard.md section 5.1"
+  },
+  {
+    "clause_id": "STD-COMM-RETRY",
+    "source_file": "sample-communication-standard.md",
+    "source_section": "3.3",
+    "title": "Communication retry",
+    "text": "Communication failures should retry according to configured retry policy.",
+    "keywords": ["communication", "retry", "timeout"],
+    "applies_to": ["communication"],
+    "constraint_level": "should",
+    "citation": "sample-communication-standard.md section 3.3"
+  },
+  {
+    "clause_id": "STD-FIRMWARE-UPDATE",
+    "source_file": "sample-firmware-standard.md",
+    "source_section": "7.4",
+    "title": "Firmware update validation",
+    "text": "Firmware update packages shall be validated before installation.",
+    "keywords": ["firmware", "update", "validation"],
+    "applies_to": ["firmware"],
+    "constraint_level": "must",
+    "citation": "sample-firmware-standard.md section 7.4"
+  },
+  {
+    "clause_id": "STD-SEC-AUDIT",
+    "source_file": "sample-security-standard.md",
+    "source_section": "9.2",
+    "title": "Security audit trail",
+    "text": "Security relevant actions should be recorded in an audit trail.",
+    "keywords": ["security", "audit", "trail"],
+    "applies_to": ["security"],
+    "constraint_level": "should",
+    "citation": "sample-security-standard.md section 9.2"
+  },
+  {
+    "clause_id": "STD-LOAD-PROFILE",
+    "source_file": "sample-metering-standard.md",
+    "source_section": "6.8",
+    "title": "Load profile data",
+    "text": "Load profile data may be exported for downstream systems.",
+    "keywords": ["load", "profile", "export"],
+    "applies_to": ["metering"],
+    "constraint_level": "reference",
+    "citation": "sample-metering-standard.md section 6.8"
+  },
+  {
+    "clause_id": "STD-REMOTE-DISCONNECT",
+    "source_file": "sample-control-standard.md",
+    "source_section": "8.5",
+    "title": "Remote disconnect command",
+    "text": "Remote disconnect commands require traceable handling.",
+    "keywords": ["remote", "disconnect", "command"],
+    "applies_to": ["control"],
+    "constraint_level": "must",
+    "citation": "sample-control-standard.md section 8.5"
+  },
+  {
+    "clause_id": "STD-TARIFF-SCHEDULE",
+    "source_file": "sample-tariff-standard.md",
+    "source_section": "10.1",
+    "title": "Tariff schedule import",
+    "text": "Tariff schedules are reference data for billing behavior.",
+    "keywords": ["tariff", "schedule", "import"],
+    "applies_to": ["billing"],
+    "constraint_level": "reference",
+    "citation": "sample-tariff-standard.md section 10.1"
+  }
+]

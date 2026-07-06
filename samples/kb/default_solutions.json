@@ -1,0 +1,100 @@
+[
+  {
+    "solution_id": "SOL-DISPLAY-CYCLE",
+    "module": "Display",
+    "submodule": "Cycle",
+    "scenario": "Automatic display cycling",
+    "trigger_terms": ["display", "cycle"],
+    "default_behavior": "cycles through configured display entries in order.",
+    "config_items": [
+      {
+        "name": "cycle_interval_seconds",
+        "default_value": "5",
+        "requires_confirmation": true
+      }
+    ],
+    "boundary_conditions": ["An empty display list disables cycling."],
+    "acceptance_criteria": ["Configured entries are shown in order."],
+    "related_standard_clause_ids": ["STD-DISPLAY-CYCLE"],
+    "requires_confirmation": false
+  },
+  {
+    "solution_id": "SOL-ALARM-EVENT",
+    "module": "Alarm",
+    "submodule": "Event log",
+    "scenario": "Alarm event recording",
+    "trigger_terms": ["alarm", "event"],
+    "default_behavior": "records alarm events with timestamp, alarm code, and state.",
+    "boundary_conditions": ["Duplicate active alarms update the existing active event."],
+    "acceptance_criteria": ["Alarm events can be reviewed after they occur."],
+    "related_standard_clause_ids": ["STD-ALARM-EVENT"],
+    "requires_confirmation": false
+  },
+  {
+    "solution_id": "SOL-COMM-RETRY",
+    "module": "Communication",
+    "submodule": "Retry",
+    "scenario": "Retry after communication timeout",
+    "trigger_terms": ["communication", "retry"],
+    "default_behavior": "retries failed communication operations according to configured retry count and interval.",
+    "config_items": [
+      {
+        "name": "max_retry_count",
+        "default_value": "3",
+        "requires_confirmation": true
+      }
+    ],
+    "boundary_conditions": ["Retries stop after the configured maximum retry count."],
+    "acceptance_criteria": ["A timeout triggers retry attempts before final failure."],
+    "related_standard_clause_ids": ["STD-COMM-RETRY"],
+    "requires_confirmation": true
+  },
+  {
+    "solution_id": "SOL-FIRMWARE-UPDATE",
+    "module": "Firmware",
+    "submodule": "Update",
+    "scenario": "Firmware package validation",
+    "trigger_terms": ["firmware", "update"],
+    "default_behavior": "validates firmware package integrity before applying the update.",
+    "boundary_conditions": ["Invalid packages are rejected before installation."],
+    "acceptance_criteria": ["A valid package can be installed and an invalid package is rejected."],
+    "related_standard_clause_ids": ["STD-FIRMWARE-UPDATE"],
+    "requires_confirmation": true
+  },
+  {
+    "solution_id": "SOL-SEC-AUDIT",
+    "module": "Security",
+    "submodule": "Audit",
+    "scenario": "Security audit trail",
+    "trigger_terms": ["security", "audit"],
+    "default_behavior": "records security relevant operations in an audit trail.",
+    "boundary_conditions": ["Audit records are append-only from the application perspective."],
+    "acceptance_criteria": ["Security operations create readable audit records."],
+    "related_standard_clause_ids": ["STD-SEC-AUDIT"],
+    "requires_confirmation": false
+  },
+  {
+    "solution_id": "SOL-REMOTE-DISCONNECT",
+    "module": "Control",
+    "submodule": "Remote disconnect",
+    "scenario": "Remote disconnect command handling",
+    "trigger_terms": ["remote", "disconnect"],
+    "default_behavior": "handles remote disconnect commands with traceable command state.",
+    "boundary_conditions": ["Commands without authorization are rejected."],
+    "acceptance_criteria": ["Accepted commands produce a traceable state transition."],
+    "related_standard_clause_ids": ["STD-REMOTE-DISCONNECT-MISSING"],
+    "requires_confirmation": false
+  },
+  {
+    "solution_id": "SOL-TARIFF-SCHEDULE",
+    "module": "Billing",
+    "submodule": "Tariff",
+    "scenario": "Tariff schedule import",
+    "trigger_terms": ["tariff", "schedule"],
+    "default_behavior": "imports tariff schedules after format validation.",
+    "boundary_conditions": ["Malformed schedules are rejected with validation errors."],
+    "acceptance_criteria": ["A valid tariff schedule can be imported and inspected."],
+    "related_standard_clause_ids": ["STD-TARIFF-SCHEDULE"],
+    "requires_confirmation": false
+  }
+]

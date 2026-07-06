@@ -47,13 +47,23 @@ def _read_items(path: Path) -> list[dict[str, Any]]:
 def load_requirements(path: Path) -> list[RequirementInput]:
     requirements = []
     for index, raw in enumerate(_read_items(path), start=1):
-        requirement_id = str(raw.get("requirement_id") or raw.get("id") or f"REQ-{index:04d}").strip()
+        requirement_id = str(
+            raw.get("requirement_id")
+            or raw.get("id")
+            or raw.get("stable_req_id")
+            or raw.get("req_id")
+            or f"REQ-{index:04d}"
+        ).strip()
         source_text = str(raw.get("source_text") or raw.get("text") or raw.get("requirement") or "").strip()
         requirements.append(
             RequirementInput(
                 requirement_id=requirement_id,
                 source_text=source_text,
-                metadata={key: value for key, value in raw.items() if key not in {"requirement_id", "id", "source_text", "text", "requirement"}},
+                metadata={
+                    key: value
+                    for key, value in raw.items()
+                    if key not in {"requirement_id", "id", "stable_req_id", "source_text", "text", "requirement"}
+                },
             )
         )
     return requirements

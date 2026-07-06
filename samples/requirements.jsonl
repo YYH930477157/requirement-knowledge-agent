@@ -1,0 +1,10 @@
+{"requirement_id":"REQ-DISPLAY-CYCLE","source_text":"Need display cycle support on LCD."}
+{"requirement_id":"REQ-ALARM-EVENT","source_text":"Need alarm event logging for field diagnostics."}
+{"requirement_id":"REQ-COMM-RETRY","source_text":"Need communication retry after link timeout."}
+{"requirement_id":"REQ-FIRMWARE-UPDATE","source_text":"Need firmware update package validation before installation."}
+{"requirement_id":"REQ-DISPLAY-CONFLICT","source_text":"Need display cycle conflict:std-display-cycle disabled for this product variant."}
+{"requirement_id":"REQ-UNKNOWN-THEME","source_text":"Need color theme palette selection in the maintenance tool."}
+{"requirement_id":"REQ-LOAD-PROFILE","source_text":"Need load profile export for downstream metering reports."}
+{"requirement_id":"REQ-REMOTE-DISCONNECT","source_text":"Need remote disconnect command handling."}
+{"requirement_id":"REQ-SEC-AUDIT","source_text":"Need security audit trail for operator actions."}
+{"requirement_id":"REQ-TARIFF-SCHEDULE","source_text":"Need tariff schedule import from billing configuration files."}

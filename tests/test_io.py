@@ -37,6 +37,27 @@ def test_load_requirements_accepts_items_object(tmp_path):
     assert requirements[0].source_text == "显示轮显"
 
 
+def test_load_requirements_accepts_atomizer_atomic_jsonl(tmp_path):
+    path = tmp_path / "atomic_requirements.jsonl"
+    path.write_text(
+        (
+            '{"stable_req_id":"SREQ-0123456789ABCDEF",'
+            '"req_id":"AREQ-000001",'
+            '"requirement":"Need display cycle support.",'
+            '"source_refs":["DOC-1#p3"],'
+            '"domain":"display"}\n'
+        ),
+        encoding="utf-8",
+    )
+
+    requirements = load_requirements(path)
+
+    assert requirements[0].requirement_id == "SREQ-0123456789ABCDEF"
+    assert requirements[0].source_text == "Need display cycle support."
+    assert requirements[0].metadata["req_id"] == "AREQ-000001"
+    assert requirements[0].metadata["source_refs"] == ["DOC-1#p3"]
+
+
 def test_read_jsonl(tmp_path):
     path = tmp_path / "items.jsonl"
     path.write_text('{"id": "a"}\n\n{"id": "b"}\n', encoding="utf-8")

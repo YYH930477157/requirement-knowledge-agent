@@ -32,6 +32,23 @@ python -m pytest -q
 rka init-kb --out .\kb
 ```
 
+从默认方案 Excel 生成运行时知识库 JSON：
+
+```powershell
+rka ingest-solutions --input .\default_solutions.xlsx --out .\kb\default_solutions.json
+```
+
+从标准 Markdown/JSON 生成运行时知识库 JSON：
+
+```powershell
+rka ingest-standards --input .\standards --out .\kb\standards.json
+```
+
+模板字段说明：
+
+- `docs/templates/default-solutions-template.md`
+- `docs/templates/standards-template.md`
+
 准备需求 JSONL：
 
 ```jsonl
@@ -42,6 +59,18 @@ rka init-kb --out .\kb
 
 ```powershell
 rka analyze --requirements .\requirements.jsonl --kb .\kb --out .\out\review
+```
+
+也可以直接分析 requirement-atomizer-vue3 导出的原子需求 JSONL：
+
+```powershell
+rka analyze --requirements .\samples\from_atomizer.jsonl --kb .\samples\kb --out .\out\from_atomizer_review
+```
+
+运行样本评估：
+
+```powershell
+rka evaluate --requirements .\samples\requirements.jsonl --kb .\samples\kb --expected .\samples\expected_decisions.json --out .\out\evaluation_report.json
 ```
 
 输出文件：
