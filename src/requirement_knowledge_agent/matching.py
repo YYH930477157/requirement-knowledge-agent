@@ -17,7 +17,7 @@ def find_terms(text: str, terms: tuple[str, ...]) -> tuple[str, ...]:
     matches = []
     for term in terms:
         normalized_term = normalize_text(term)
-        if normalized_term and normalized_term in normalized and normalized_term not in matches:
+        if normalized_term and _term_in_text(normalized_term, normalized) and normalized_term not in matches:
             matches.append(normalized_term)
     return tuple(matches)
 
@@ -108,3 +108,10 @@ def _terms_from_reasons(reasons: tuple[dict[str, object], ...]) -> tuple[str, ..
         if term not in terms:
             terms.append(term)
     return tuple(terms)
+
+
+def _term_in_text(term: str, text: str) -> bool:
+    if term.isascii() and any(char.isalnum() for char in term):
+        pattern = rf"(?<![a-z0-9]){re.escape(term)}(?![a-z0-9])"
+        return re.search(pattern, text) is not None
+    return term in text

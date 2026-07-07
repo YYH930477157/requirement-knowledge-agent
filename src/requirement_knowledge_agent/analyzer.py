@@ -53,7 +53,7 @@ def analyze_requirements(
                 "solutions": [_solution_match_summary(match) for match in solution_matches],
             },
         }
-        if best_solution and best_solution.requires_confirmation and decision.status == "applied":
+        if best_solution and _solution_requires_confirmation(best_solution) and decision.status == "applied":
             item["decision"] = "suggested"
             item["open_questions"].append("默认方案标记为需要确认，请评审后再作为确定方案。")
         items.append(item)
@@ -89,6 +89,10 @@ def _developer_guidance(solution: DefaultSolution | None) -> list[str]:
         suffix = "，需确认" if item.requires_confirmation else ""
         guidance.append(f"配置项 {item.name} 默认值为 {item.default_value}{suffix}。")
     return guidance
+
+
+def _solution_requires_confirmation(solution: DefaultSolution) -> bool:
+    return solution.requires_confirmation or any(item.requires_confirmation for item in solution.config_items)
 
 
 def _open_questions(decision_questions: tuple[str, ...], solution: DefaultSolution | None) -> list[str]:

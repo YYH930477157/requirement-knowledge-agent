@@ -97,3 +97,17 @@ def test_match_solution_weak_when_one_trigger_term_matches():
 def test_no_match_when_terms_absent():
     assert match_standards("billing tariff", [clause()]) == []
     assert match_solutions("billing tariff", [solution()]) == []
+
+
+def test_ascii_terms_require_word_boundaries():
+    load_solution = DefaultSolution(
+        solution_id="SOL-LOAD",
+        module="Metering",
+        submodule="Load profile",
+        scenario="Load profile export",
+        trigger_terms=("load", "profile"),
+        default_behavior="Export load profile data.",
+    )
+
+    assert find_terms("download profile settings", ("load", "profile")) == ("profile",)
+    assert match_solutions("download profile settings", [load_solution])[0].strength == "weak"

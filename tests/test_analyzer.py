@@ -1,5 +1,5 @@
 from requirement_knowledge_agent.analyzer import analyze_requirements
-from requirement_knowledge_agent.models import DefaultSolution, RequirementInput, StandardClause
+from requirement_knowledge_agent.models import ConfigItem, DefaultSolution, RequirementInput, StandardClause
 
 
 def clause():
@@ -90,6 +90,33 @@ def test_review_item_includes_solution_confirmation_questions():
     package = analyze_requirements([RequirementInput("REQ-1", "电表需要支持显示轮显")], [clause()], [solution()])
 
     assert "请确认轮显周期。" in package["items"][0]["open_questions"]
+
+
+def test_config_item_requiring_confirmation_downgrades_applied_to_suggested():
+    solution_with_confirmed_config = DefaultSolution(
+        solution_id="SOL-1",
+        module="显示",
+        submodule="轮显",
+        scenario="显示轮显",
+        trigger_terms=("显示", "轮显"),
+        default_behavior="软件按配置顺序轮显条目。",
+        config_items=(ConfigItem(name="cycle_interval_seconds", default_value="5", requires_confirmation=True),),
+        boundary_conditions=("显示列表为空时不启动轮显。",),
+        acceptance_criteria=("配置显示列表后，软件按顺序显示条目。",),
+        related_standard_clause_ids=("STD-1",),
+        requires_confirmation=False,
+    )
+
+    package = analyze_requirements(
+        [RequirementInput("REQ-1", "电表需要支持显示轮显")],
+        [clause()],
+        [solution_with_confirmed_config],
+    )
+    item = package["items"][0]
+
+    assert item["decision"] == "suggested"
+    assert "配置项 cycle_interval_seconds 默认值为 5，需确认。" in item["developer_guidance"]
+    assert item["open_questions"]
 
 
 def test_malformed_requirement_is_reported_as_input_error():

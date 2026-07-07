@@ -3,8 +3,8 @@
     "requirement_id": "REQ-DISPLAY-CYCLE",
     "expected_standard_clause_ids": ["STD-DISPLAY-CYCLE"],
     "expected_solution_ids": ["SOL-DISPLAY-CYCLE"],
-    "expected_decision": "applied",
-    "notes": "Strong must standard and strong default solution."
+    "expected_decision": "suggested",
+    "notes": "Strong must standard and strong default solution, but one config item requires confirmation."
   },
   {
     "requirement_id": "REQ-ALARM-EVENT",
